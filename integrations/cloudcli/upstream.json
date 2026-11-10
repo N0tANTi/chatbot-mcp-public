@@ -1,0 +1,10 @@
+{
+  "repository": "https://github.com/siteboon/claudecodeui",
+  "tag": "v1.37.4",
+  "npmPackage": "@cloudcli-ai/cloudcli",
+  "version": "1.37.4",
+  "license": "AGPL-3.0-or-later",
+  "npmIntegrity": "sha512-+RWZCWyXKeVk7EVttDupSMyTMeBS+K0kQJAv840bnGgiam2cNMeTjr4/FI8WNpsy2CBYN7AojZAuyg806yi2cg==",
+  "referenceOnly": false,
+  "frontendCustomization": "not started; awaiting captured reference and visual selection"
+}

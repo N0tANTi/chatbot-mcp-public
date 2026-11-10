@@ -1,0 +1,9 @@
+{
+  "name": "chatbot-mcp-cloudcli-runtime",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Pinned upstream CloudCLI runtime for private VPS integration testing",
+  "dependencies": {
+    "@cloudcli-ai/cloudcli": "1.37.4"
+  }
+}

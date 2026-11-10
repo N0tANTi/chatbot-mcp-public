@@ -1,0 +1,241 @@
+/* Open-claude-ui's sans / display / mono roles, adapted for Chinese reading.
+   All font files and OFL notices are served locally from /fonts/. */
+@import url('/fonts/fonts.css');
+/* Inter for Latin text, but without the curly quotes, dashes and ellipsis that Chinese
+   text shares with English: those come from the Chinese font so they keep full width. */
+@font-face {font-family:'Inter Text';font-style:normal;font-weight:400 600;font-display:swap;src:url(/fonts/3100e775e8616cd2611b.woff2) format('woff2');
+  unicode-range:U+0000-00B6,U+00B8-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-2013,U+2015-2017,U+2020-2025,U+2027-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
+/* Chinese: Noto Sans SC (思源黑体), served locally, so it looks the same on every device.
+   System fonts only fill in if it cannot load. */
+:root {
+  --font-cjk: 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei UI', 'Microsoft YaHei';
+  --font-ui: 'Inter Text', var(--font-cjk), 'Segoe UI', sans-serif;
+  --font-display: 'Newsreader', var(--font-cjk), serif;
+  --font-code: 'JetBrains Mono', 'Cascadia Mono', Consolas, var(--font-cjk), monospace;
+  --type-caption: 12px;
+  --type-small: 13px;
+  --type-ui: 14px;
+  --type-body: 17px;
+  --type-code: 14px;
+  font-family: var(--font-ui);
+  font-size: var(--type-ui);
+  font-weight: 400;
+  line-height: 1.5;
+  font-optical-sizing: auto;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+body, button, input, select, textarea {font-family:var(--font-ui);}
+button, input, select, textarea {line-height:1.5;letter-spacing:0;}
+strong,b {font-weight:600;}
+h1,h2,h3,h4,h5,h6 {font-family:var(--font-ui);font-weight:600;letter-spacing:-.02em;line-height:1.45;}
+.wordmark {font-family:var(--font-display);font-size:32px;line-height:1;font-weight:600;letter-spacing:-.7px;}
+.welcome h1 {font-family:var(--font-display);font-size:clamp(30px,3vw,44px);font-weight:400;letter-spacing:-1px;}
+.home,.project {font-size:15px;font-weight:500;line-height:1.55;}
+.project {padding:12px 14px;gap:12px;}
+.project svg,.home svg {width:21px;height:21px;}
+.sessions button {font-size:14px;line-height:1.6;padding:10px 12px;gap:11px;}
+.section-label,.sidebar footer,.sidebar footer small {font-size:var(--type-caption);}
+.chat-breadcrumb {font-size:var(--type-ui);font-weight:400;}
+.chat-breadcrumb b {font-weight:500;}
+.connection-state,.view-switch button,.chat-actions button {font-size:var(--type-small);}
+.view-switch button {font-weight:500;padding:8px 15px;}
+.message,.memory-content,.download-preview {font-family:var(--font-ui);font-size:var(--type-body);font-weight:400;line-height:1.75;letter-spacing:0;color:#1f1e1c;}
+.message p {margin:0 0 1em;}
+.message h1 {font-size:26px;margin:1.3em 0 .65em;}
+.message h2 {font-size:22px;margin:1.3em 0 .65em;}
+.message h3 {font-size:19px;margin:1.2em 0 .55em;}
+.message li+li {margin-top:.35em;}
+.message ul,.message ol {padding-left:1.6em;}
+.message th,.message td {font-size:15px;line-height:1.7;padding:10px 12px;}
+.message blockquote {margin:1em 0;padding-left:16px;border-left:3px solid #d8d2c9;color:#6d675e;}
+.message a,.download-preview a {color:#a34f34;text-decoration-thickness:1px;text-underline-offset:3px;overflow-wrap:anywhere;}
+.message pre,.message code,.memory-content pre,.memory-content code,.download-preview pre,.activity-preview,.activity-details pre,.permission pre {
+  font-family:var(--font-code);font-size:var(--type-code);font-weight:400;line-height:1.75;letter-spacing:0;font-variant-ligatures:none;tab-size:2;
+}
+.message :not(pre)>code {font-size:.86em;background:#eeeae3;border-radius:4px;padding:2px 5px;}
+.message pre code {font-size:inherit;}
+.activity-heading {font-size:var(--type-small);gap:8px 12px;line-height:1.7;}
+.activity-heading strong {font-size:var(--type-ui);font-weight:500;}
+.activity-target,.activity-caption {font-size:var(--type-small);color:#6f6a61;}
+.activity-heading small,.detail-label {font-size:var(--type-caption);}
+.activity-preview,.activity-details pre {padding:14px 16px;}
+.run-status {font-size:var(--type-small);}
+.run-status small {font-size:var(--type-caption);font-variant-numeric:tabular-nums;}
+.composer textarea,.chat textarea {font-size:var(--type-body);line-height:1.75;}
+.composer textarea::placeholder {color:#9b968e;}
+.model-select {font-family:var(--font-ui);font-size:13px;font-weight:500;max-width:210px;}
+.context button {font-size:14px;font-weight:500;}
+.memory-drawer h2,.dialog h2 {font-size:22px;}
+.return-bottom {font-family:var(--font-ui);font-size:12px;font-weight:500;line-height:1.5;box-shadow:0 2px 8px #00000008;padding:8px 13px;}
+.chat-actions>div {min-width:245px;padding:7px;}
+.permission-setting {display:flex;flex-direction:column;gap:8px;margin:5px;padding:12px 6px 6px;border-top:1px solid var(--border);}
+.permission-setting span {font-size:12px;font-weight:500;color:#6f6a61;}
+.permission-setting select {font-family:var(--font-ui);font-size:13px;max-width:none;width:100%;border:1px solid var(--border);border-radius:8px;background:#f9f8f5;padding:8px 10px;color:#34312b;}
+.permission-setting small {font-size:11px;line-height:1.65;color:#79736b;}
+.welcome-settings {position:absolute;top:22px;right:30px;z-index:4;}
+.composer-tools>div:last-child {min-width:0;}
+.model-controls {position:relative;min-width:0;}
+.model-controls summary {display:flex;align-items:center;gap:8px;list-style:none;cursor:pointer;font-size:13px;line-height:1.6;padding:8px 5px;max-width:240px;border-radius:8px;}
+.model-controls summary::-webkit-details-marker {display:none;}
+.model-controls summary:hover {background:var(--hover);}
+.model-controls summary:focus-visible {outline:2px solid #a34f34;outline-offset:2px;}
+.selected-model {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;}
+.selected-effort {color:#79736b;white-space:nowrap;}
+.model-controls summary svg {flex-shrink:0;color:#79736b;}
+.model-settings {position:absolute;right:0;bottom:calc(100% + 12px);z-index:8;width:290px;max-width:calc(100vw - 32px);max-height:60vh;overflow-y:auto;padding:18px;background:#fffefd;border:1px solid var(--border);border-radius:14px;box-shadow:0 8px 30px #0000000d;}
+.model-settings label {display:flex;flex-direction:column;gap:8px;font-size:12px;color:#6f6a61;}
+.model-settings select {width:100%;font:14px/1.5 var(--font-ui);padding:9px 10px;color:#34312b;background:#f9f8f5;border:1px solid var(--border);border-radius:8px;}
+.model-settings p {font-size:12px;line-height:1.7;color:#79736b;margin:8px 0 18px;}
+.model-settings p:last-child {margin-bottom:0;}
+.model-settings p.model-warning {color:#9a5a1f;background:#fbf1e6;border-radius:8px;padding:8px 10px;margin-top:-8px;}
+.trash-entry {display:flex;align-items:center;gap:10px;margin:4px 12px 12px;padding:11px 14px;color:#79736b;font-size:13px;border-radius:10px;}
+.trash-entry:hover {background:var(--hover);}
+.chat-actions .delete-chat {color:#9f3f34;}
+.dialog .delete-title {font-weight:500;overflow-wrap:anywhere;}
+.dialog-actions {display:flex;justify-content:flex-end;gap:12px;margin-top:24px;}
+.dialog-actions button {padding:10px 15px;border:1px solid var(--border);border-radius:9px;}
+.dialog-actions .danger-action {color:white;background:#9f3f34;border-color:#9f3f34;}
+.conversation-files {max-width:916px;margin:20px auto 24px;}
+.conversation-files>p {font-size:13px;font-weight:500;color:#6f6a61;}
+.conversation-files>p small {display:block;font-size:12px;font-weight:400;color:#8c877e;margin-top:4px;}
+.generated-card {display:flex;align-items:center;gap:13px;border:1px solid var(--border);border-radius:13px;padding:15px 16px;margin-top:10px;background:#fffefd;}
+.generated-card>svg {color:#a46e56;flex-shrink:0;}
+.generated-card>div {min-width:0;flex:1;}
+.generated-card strong {display:block;font-size:14px;font-weight:500;overflow-wrap:anywhere;}
+.generated-card small,.file-row>div small {display:block;font-size:12px;color:#8c877e;line-height:1.6;overflow-wrap:anywhere;}
+.generated-card a,.generated-card .file-download {display:flex;box-shadow:none;background:none;align-items:center;gap:6px;padding:8px 10px;color:#9a5239;border:1px solid #e4d8d0;border-radius:8px;font-size:13px;text-decoration:none;white-space:nowrap;}
+.generated-card a:hover,.generated-card .file-download:hover {background:#f5ede7;}
+.file-row>div {min-width:0;flex:1;overflow-wrap:anywhere;}
+.file-row>div strong {font-size:14px;font-weight:500;}
+@media(max-width:760px){
+  .conversation-files {margin:20px auto 24px;}
+  .generated-card {padding:13px 12px;gap:10px;}
+  .model-controls summary {max-width:min(220px,calc(100vw - 150px));gap:6px;}
+  .message,.memory-content,.download-preview {font-size:16px;line-height:1.8;}
+  .activity-heading strong {font-size:13px;}
+  .activity-target {font-size:12px;}
+  .activity-preview,.activity-details pre,.permission pre {font-size:12px;line-height:1.75;}
+  .chat-breadcrumb {font-size:12px;}
+  .view-switch button {font-size:12px;padding:7px 10px;}
+  .model-select {font-size:13px;max-width:180px;}
+  .chat textarea {font-size:16px;}
+  .chat-actions>div {width:245px;max-width:calc(100vw - 24px);}
+  .welcome-settings {top:20px;right:15px;}
+}
+
+/* Layout polish (2026-10-21): compact sidebar, quiet scrollbars, header over the conversation. */
+.sidebar {padding:18px 10px 12px;}
+.sidebar header {margin-bottom:18px;}
+.sidebar .home {display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500;padding:9px 12px;margin:0 0 18px;border-radius:10px;color:#34312b;}
+.sidebar .home:hover {background:var(--hover);}
+.sidebar .home svg {width:19px;height:19px;color:#97452e;}
+.section-label {margin:0 12px 6px;font-size:12px;}
+.project-head {position:relative;}
+.sidebar .project {display:flex;align-items:center;font-size:14px;font-weight:500;padding:8px 12px;gap:10px;border-radius:10px;}
+.sidebar .project svg {width:18px;height:18px;flex-shrink:0;}
+.sidebar .project>svg:last-child {width:14px;height:14px;color:#9a958d;}
+.sidebar .project:hover {background:var(--hover);}
+.sidebar .project.active {background:none;color:#97452e;}
+.project-new {position:absolute;right:34px;top:50%;transform:translateY(-50%);z-index:1;display:none;padding:4px;border-radius:7px;color:#6f6a61;background:none;}
+.project-new:hover {background:#dcd9d2;color:#34312c;}
+.project-head:hover>.project-new,.project-new:focus-visible {display:flex;}
+.sidebar .project span {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.project-head:hover>.project span {margin-right:28px;}
+@media(hover:none){.project-new{display:flex;}}
+.sessions {padding:2px 4px 10px 20px;}
+.sidebar .sessions button {font-size:13.5px;line-height:1.5;padding:7px 10px;gap:9px;border-radius:8px;}
+.sidebar .sessions button svg {width:16px;height:16px;flex-shrink:0;}
+.session-group {margin:10px 10px 2px;font-size:11px;}
+.no-history {margin:6px 10px;font-size:12px;}
+.sidebar nav {flex:1;min-height:0;margin:0 -4px;padding:0 4px;}
+.sidebar footer {padding:12px 8px 0;border-top:1px solid #e8e6e0;margin-top:10px;}
+
+/* Thin scrollbars that stay out of the way until needed. */
+.sidebar nav,.messages,.memory-content,.model-settings {scrollbar-width:thin;scrollbar-color:transparent transparent;}
+.sidebar nav:hover,.messages:hover,.memory-content:hover,.model-settings:hover {scrollbar-color:#d3cfc7 transparent;}
+.sidebar nav::-webkit-scrollbar,.messages::-webkit-scrollbar {width:8px;}
+.sidebar nav::-webkit-scrollbar-track,.messages::-webkit-scrollbar-track {background:transparent;}
+.sidebar nav::-webkit-scrollbar-button,.messages::-webkit-scrollbar-button {display:none;height:0;}
+.sidebar nav::-webkit-scrollbar-thumb,.messages::-webkit-scrollbar-thumb {background:transparent;border-radius:8px;border:2px solid transparent;background-clip:padding-box;}
+.sidebar nav:hover::-webkit-scrollbar-thumb,.messages:hover::-webkit-scrollbar-thumb {background-color:#d3cfc7;}
+
+/* The conversation runs under a fading header instead of below a blank band. */
+main.chat .chat-header {position:absolute;top:0;left:0;right:12px;z-index:3;min-height:64px;padding:14px 30px;background:linear-gradient(#faf9f6 72%,#faf9f600);pointer-events:none;}
+main.chat .chat-header>* {pointer-events:auto;}
+main.chat .messages {padding-top:72px;}
+@media(max-width:760px){main.chat .chat-header{padding:12px 14px 12px 65px;}main.chat .messages{padding-top:66px;}}
+
+/* Copy / regenerate sit below the reply; keep the file tiles clear of them. */
+.message:has(.message-actions)+.turn-files {margin-top:40px;}
+
+/* Composer: no reserved blank lines; it grows with the text (up to 40% of the window). */
+.chat .composer {padding:14px 18px 12px;}
+.chat textarea,.composer textarea {min-height:28px;}
+.chat .composer-tools {margin-top:6px;}
+.attachment-list {margin-bottom:8px;}
+
+/* View switch inside the ... menu. */
+.chat-actions .view-switch {display:flex;padding:3px;border-radius:10px;}
+.chat-actions .view-switch button {flex:1;justify-content:center;padding:6px 10px;border-radius:7px;}
+.chat-actions .view-switch button[aria-pressed=true] {background:#f2e4db;color:#97452e;}
+
+/* Light motion: short fades for pop-ups, drawers and dialogs. */
+@keyframes cc-pop {from{opacity:0;transform:translateY(-4px) scale(.98);}to{opacity:1;transform:none;}}
+@keyframes cc-pop-up {from{opacity:0;transform:translateY(4px) scale(.98);}to{opacity:1;transform:none;}}
+@keyframes cc-fade {from{opacity:0;}to{opacity:1;}}
+@keyframes cc-slide {from{opacity:.6;transform:translateX(24px);}to{opacity:1;transform:none;}}
+@keyframes cc-dialog {from{opacity:0;transform:translateY(8px) scale(.98);}to{opacity:1;transform:none;}}
+@keyframes cc-open {from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:none;}}
+.chat-actions[open]>div {animation:cc-pop .14s ease-out;transform-origin:top right;}
+.account-menu,.model-controls[open] .model-settings {animation:cc-pop-up .14s ease-out;transform-origin:bottom center;}
+.drawer-backdrop {animation:cc-fade .16s ease-out;}
+.memory-drawer {animation:cc-slide .2s cubic-bezier(.2,.7,.3,1);}
+.dialog {animation:cc-dialog .18s cubic-bezier(.2,.7,.3,1);}
+.sessions {animation:cc-open .16s ease-out;}
+.project>svg:last-child,.activity-heading svg:last-child {transition:transform .15s;}
+.sidebar .project,.sessions button,.session-row-actions button,.project-new,.chat-actions summary,.model-controls summary,button.context-usage {transition:background-color .12s,color .12s;}
+.activity-group-items {animation:cc-open .14s ease-out;}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:1ms!important;transition-duration:1ms!important;}}
+
+/* Reading comfort closer to claude.ai: warm near-black text, warm user bubble. */
+:root {color:#1f1e1c;}
+.message p {margin:0 0 .85em;}
+.message li+li {margin-top:.3em;}
+/* 17 px text reads best at a ~1.7 line height; Noto Sans SC 400 looks slightly thin on Windows. */
+.message,.memory-content,.download-preview {line-height:1.7;}
+.message strong,.message b {font-weight:600;}
+.sidebar .project {font-size:14.5px;}
+.sidebar .sessions button {font-size:14px;}
+.chat-breadcrumb {font-size:14.5px;}
+
+/* Context size: calm green while small, the warm tone in the middle, a clear warning when large. */
+button.context-usage.low {color:#3f7a5d;background:#eaf3ec;}
+button.context-usage.mid {color:#8a5a2b;background:#fbf0e3;}
+button.context-usage.high {color:#a3402a;background:#f9e3dc;font-weight:500;}
+
+/* One block rhythm: tables, code and quotes get the same space above and below. */
+.message-body>:is(p,ul,ol) {margin-top:0;margin-bottom:.85em;}
+.message-body>:is(table,.code-block,blockquote,hr) {margin:1.1em 0;}
+.message-body>:first-child {margin-top:0;}
+.message-body>:last-child {margin-bottom:0;}
+
+/* New arrivals ease in; loaded history appears at once. */
+@keyframes cc-arrive {from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.arrive {animation:cc-arrive .28s cubic-bezier(.2,.7,.3,1) both;}
+.run-status {animation:cc-pop-up .2s cubic-bezier(.2,.7,.3,1);}
+/* The run card's Claude mark is the one moving indicator. Two layers that each loop seamlessly:
+   a constant full turn (the rays are uneven, so only 360° lands where it started) and a breath
+   that eases back and forth, so neither ever snaps or stops. */
+@keyframes cc-turn {to{transform:rotate(360deg);}}
+@keyframes cc-breathe {from{transform:scale(1);opacity:1;}to{transform:scale(.8);opacity:.82;}}
+.run-spark {display:grid;place-items:center;width:20px;height:20px;flex-shrink:0;animation:cc-breathe 1.5s ease-in-out infinite alternate;}
+.run-spark img {display:block;width:100%;height:100%;animation:cc-turn 6s linear infinite;will-change:transform;}
+/* A live step glows instead of spinning. */
+@keyframes cc-glow {0%{box-shadow:0 0 0 0 #c96a4a55;}70%{box-shadow:0 0 0 7px #c96a4a00;}100%{box-shadow:0 0 0 0 #c96a4a00;}}
+.live-dot {display:grid;place-items:center;width:22px;height:22px;}
+.live-dot::before {content:"";width:9px;height:9px;border-radius:50%;background:#c96a4a;animation:cc-glow 1.8s ease-out infinite;}
+@media (prefers-reduced-motion: reduce){.run-spark,.run-spark img,.live-dot::before{animation:none!important;}}
+
+/* A user's own line breaks stay as typed (Markdown would join single newlines into a space). */
+.message.user .message-body :is(p,li) {white-space:pre-wrap;}

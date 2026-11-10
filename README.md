@@ -32,3 +32,5 @@ node --test tests/*.test.mjs
 本仓库集成及前端依原有声明以 AGPL-3.0 发布，见 [LICENSE](LICENSE) 和 [来源声明](integrations/cloudcli/NOTICE.md)。CloudCLI 来自 [siteboon/claudecodeui](https://github.com/siteboon/claudecodeui)。界面参考项目的 MIT 声明与字体 OFL 声明随源码保留。
 
 原工作区附带的 [cc-connect](https://github.com/chenhg5/cc-connect) 仅为未部署的上游参考，不随此公开快照复制。
+
+获取此公开版本：`git clone https://github.com/N0tANTi/chatbot-mcp-public.git`。构建目录、依赖缓存及个人运行数据不会随同步发布。

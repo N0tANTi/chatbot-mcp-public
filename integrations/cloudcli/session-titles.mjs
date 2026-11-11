@@ -12,6 +12,10 @@ export function firstExchange(messages, {user = 2000, reply = 800} = {}) {
   return {user: text(messages[at]).trim().slice(0, user), reply: text(answer).trim().slice(0, reply)};
 }
 
+// Upstream's placeholder name for a new chat (buildCloudCliSessionName): the first four
+// whitespace-separated words. Chats created before the seed stored it hold the raw 80 characters.
+export const upstreamSessionName = seed => String(seed ?? '').trim().split(/\s+/).filter(Boolean).slice(0, 4).join(' ') || 'Untitled Session';
+
 export const titlePrompt = ({user, reply}) =>
   `下面是一段对话的开头。写一个简短的标题，概括用户想做的事或讨论的主题（不要复述助手的回答）：用与用户相同的语言；中文不超过 14 个字，英文不超过 6 个词；不要引号、句末标点或“标题：”之类的前缀。只输出标题本身。\n\n<用户>\n${user}\n</用户>\n\n<助手>\n${reply}\n</助手>`;
 

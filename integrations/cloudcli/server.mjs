@@ -14,7 +14,7 @@ import {hasMemoryHabit,withMemoryHabit} from './project-template.mjs';
 import {createActivityNormalizer, runActivity} from './activity-events.mjs';
 import {effortCapabilities, resolveEffort, reasoningOptions} from './model-routing.mjs';
 import {installSessionTrashRoutes} from './session-trash.mjs';
-import {firstExchange,generateTitle} from './session-titles.mjs';
+import {firstExchange,generateTitle,upstreamSessionName} from './session-titles.mjs';
 import {networkMode,networkEnvironment} from './network-policy.mjs';
 import {officialEnvironment,checkOfficialStartup,cleanProviderEnvironment} from './official-account.mjs';
 import {assertActiveAccount,claudeConfigDir,hostQueryOptions,HOST_MODES,MAX_ACCOUNTS,watchProviderSession} from './host-execution.mjs';
@@ -373,7 +373,8 @@ app.post(
     if(p.archived)throw fail('请先恢复项目');
     const projectPath=p.cwd,seed=String(req.body.content ?? "").slice(0, 80);
     const created=providers.sessionsService.createAppSession("claude",projectPath,seed);
-    if(req.body.autoTitle!==false)tenants.sql.prepare('INSERT OR REPLACE INTO cc_session_titles(session_id,seed) VALUES(?,?)').run(created.sessionId,seed);
+    // Remember the name upstream actually stored (it keeps four words), so the title step can tell it from a rename.
+    if(req.body.autoTitle!==false)tenants.sql.prepare('INSERT OR REPLACE INTO cc_session_titles(session_id,seed) VALUES(?,?)').run(created.sessionId,created.sessionName??seed);
     res.status(201).json(created);
   }),
 );
@@ -445,7 +446,8 @@ app.post('/api/core/sessions/:id/title',wrap(async(req,res)=>{
   const row=getSession(uid(req),req.params.id),force=req.body?.force===true;
   const pending=tenants.sql.prepare('SELECT seed FROM cc_session_titles WHERE session_id=?').get(row.session_id);
   const current=()=>db.getConnection().prepare('SELECT custom_name FROM sessions WHERE session_id=?').get(row.session_id)?.custom_name;
-  if(!force&&(!pending||pending.seed!==row.custom_name))return res.json({id:row.session_id,title:row.custom_name,skipped:true});
+  const unrenamed=name=>pending&&[pending.seed,upstreamSessionName(pending.seed)].includes(name);
+  if(!force&&!unrenamed(row.custom_name))return res.json({id:row.session_id,title:row.custom_name,skipped:true});
   if(titling.has(row.session_id))return res.json({id:row.session_id,title:row.custom_name,skipped:true});
   const history=await providers.sessionsService.fetchHistory(row.session_id,{limit:null,offset:0});
   const exchange=firstExchange(history.messages??history.data?.messages??[]);
@@ -456,7 +458,7 @@ app.post('/api/core/sessions/:id/title',wrap(async(req,res)=>{
     const title=await generateTitle({query,exchange,options:{...await officialQueryBase(await networkMode()),model:ids.includes('haiku')?'haiku':ids[0]}});
     if(!title)throw fail('没有生成可用的标题，请稍后再试',502);
     if(force)return res.json({id:row.session_id,title,suggested:true});
-    if(current()!==pending.seed)return res.json({id:row.session_id,title:current(),skipped:true});
+    if(!unrenamed(current()))return res.json({id:row.session_id,title:current(),skipped:true});
     db.getConnection().prepare('UPDATE sessions SET custom_name=? WHERE session_id=?').run(title,row.session_id);
     tenants.sql.prepare('DELETE FROM cc_session_titles WHERE session_id=?').run(row.session_id);
     res.json({id:row.session_id,title});

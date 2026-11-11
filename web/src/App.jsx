@@ -371,8 +371,7 @@ export function App() {
           setRunning((r) => ({ ...r, [id]: false }));
           setApprovals((a) => ({ ...a, [id]: [] }));
           refreshProjects().catch(() => {});
-          // The server names a conversation once, after its first reply, unless it was renamed by hand.
-          api(`/api/core/sessions/${id}/title`,{method:'POST',body:'{}'}).then(d=>{if(!d.skipped)refreshProjects().catch(()=>{});}).catch(()=>{});
+          titleIfPending(id);
           if (selection.current === id)
             history(id, false).catch((e) => setError(e.message));
         }
@@ -459,6 +458,9 @@ export function App() {
     if(list)list.scrollTop=stick.current?list.scrollHeight:top;
   },[draft,selected]);
   const pendingFiles=attachments[key]||[];
+  // The server names a conversation once, after its first reply, unless it was renamed by hand.
+  // Opening a chat retries, so one whose title step was missed still gets named.
+  const titleIfPending=id=>api(`/api/core/sessions/${id}/title`,{method:'POST',body:'{}'}).then(d=>{if(!d.skipped)refreshProjects().catch(()=>{});}).catch(()=>{});
   const choose = (slug, id = null) => {
     loading.current++;
     if (id) { delete pageFrom.current[id]; quietUntil.current[id]=Infinity; setUnread(u=>u[id]?{...u,[id]:false}:u); }
@@ -473,7 +475,7 @@ export function App() {
     setModel(id?listed?.model||'claude-opus-5-5':model);
     if(listed?.effort)setSessionEfforts(e=>e[id]?e:{...e,[id]:listed.effort});
     if (innerWidth < 760) setSidebar(false);
-    if (id) history(id).catch((e) => setError(e.message));
+    if (id) { history(id).catch((e) => setError(e.message)); if (!running[id]) titleIfPending(id); }
   };
   // Starts a turn now; callers make sure the session is idle.
   const dispatch=(id,item)=>{

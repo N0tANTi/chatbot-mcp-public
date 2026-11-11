@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {cleanTitle,firstExchange,generateTitle,titlePrompt} from '../../integrations/cloudcli/session-titles.mjs';
+import {cleanTitle,firstExchange,generateTitle,titlePrompt,upstreamSessionName} from '../../integrations/cloudcli/session-titles.mjs';
 
 test('first exchange skips slash commands, compaction rows and tool rows', () => {
   const rows = [
@@ -35,4 +35,12 @@ test('generation runs one tool-less turn and reads the result', async () => {
   assert.equal(seen.options.model, 'haiku');
   assert.deepEqual([seen.options.maxTurns, seen.options.allowedTools, seen.options.tools, seen.options.settingSources, seen.options.persistSession], [1, [], [], [], false]);
   assert.ok(seen.options.abortController instanceof AbortController);
+});
+
+test('placeholder name matches what upstream stores for a new chat', () => {
+  assert.equal(upstreamSessionName('Leo Bersani & Adam Phillips 的书'), 'Leo Bersani & Adam');
+  assert.equal(upstreamSessionName('测算  第一个 2026 年数据'), '测算 第一个 2026 年数据');
+  assert.equal(upstreamSessionName('第一行\n\n第二行'), '第一行 第二行');
+  assert.equal(upstreamSessionName('整段中文没有空格'), '整段中文没有空格');
+  assert.equal(upstreamSessionName('  '), 'Untitled Session');
 });

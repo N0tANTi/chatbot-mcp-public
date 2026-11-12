@@ -31,7 +31,7 @@
     "integrations/cloudcli/upstream.json": "1abaf59cd3ad2c342d56cc84fad72fe73b3596f10c871697a600b33f3c60b3db",
     "tools/cc_network.py": "329cf342cee565b2cc59484ad75d2a8b7d081a54f2cfe0fbaafb79917050f2ed",
     "tools/cc_official.py": "c8423c61d9412c1994d0dc3d5a6bf42d2bd272563c284b09d8eff9a516fe7e0e",
-    "tools/install_web_release.py": "90a7af2c3fc25374a51041768f979f5eb2f0fb3a809f2140e38c96d7430a0148",
+    "tools/install_web_release.py": "79d524de6f4dbdb5a4ac26d0f49a63ff631109788e70acb51106b07c7e97ff41",
     "tools/migrate_web_host_history.py": "cfed2e9fbfe43b43748e0528f686fc02f42124795269730dfa03a11f9ef47b13",
     "tools/package_web_release.py": "e47d7f5e76d1ecd999a0d398fea99f77408a21ed024724e657f55763783c54f6",
     "tools/run_cloudcli.mjs": "c98a5fd81181af1985d939137308ee6ec3043cff8b7281ff84e2aacaad6ec951",

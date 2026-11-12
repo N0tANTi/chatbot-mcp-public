@@ -20,7 +20,7 @@ if home.exists() or home.is_symlink():
 else: home.symlink_to(base/'config',target_is_directory=True)
 cache=base/'cache'/a.release
 previous=base/'current'
-if previous.exists() and (previous/'package-lock.json').read_bytes()==(destination/'package-lock.json').read_bytes():
+if previous.exists() and (previous/'package-lock.json').read_bytes().replace(b'\r\n',b'\n')==(destination/'package-lock.json').read_bytes().replace(b'\r\n',b'\n'):
     # Pinned dependencies are immutable; reuse verified files, never runtime data.
     shutil.copytree(previous/'node_modules',destination/'node_modules',copy_function=os.link,symlinks=True)
 else:

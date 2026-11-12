@@ -22,7 +22,7 @@ export function ModelControls({model,models,labels={},onModelChange,effort,confi
       <span className="selected-model">{label(model)}</span><span className="selected-effort">{models.length&&!models.includes(model)?'已停用':config.pending?'读取中':names[effort]}</span><CaretDown size={13}/>
     </summary>
     <div className="model-settings">
-      <label><span>官方账号模型</span><select aria-label="选择模型" value={model} disabled={busy} onChange={event=>onModelChange(event.target.value)}>{(()=>{const all=[...new Set([...models,model])],option=id=><option key={id} value={id} disabled={!models.includes(id)}>{label(id)}{models.length&&!models.includes(id)?'（历史记录，已停用）':''}</option>;
+      <label><span>可用模型</span><select aria-label="选择模型" value={model} disabled={busy} onChange={event=>onModelChange(event.target.value)}>{(()=>{const all=[...new Set([...models,model])],option=id=><option key={id} value={id} disabled={!models.includes(id)}>{label(id)}{models.length&&!models.includes(id)?'（历史记录，已停用）':''}</option>;
         const latest=all.filter(id=>!id.startsWith('claude-')),pinned=all.filter(id=>id.startsWith('claude-'));
         return pinned.length&&latest.length?<><optgroup label="最新版本">{latest.map(option)}</optgroup><optgroup label="指定型号">{pinned.map(option)}</optgroup></>:all.map(option);})()}</select></label>
       <p>{inChat?'只改这段对话，下一条消息生效；新对话会沿用最近的选择。':'新对话使用这里的选择。'}</p>

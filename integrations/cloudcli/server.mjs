@@ -16,7 +16,7 @@ import {effortCapabilities, resolveEffort, reasoningOptions} from './model-routi
 import {installSessionTrashRoutes} from './session-trash.mjs';
 import {firstExchange,generateTitle,upstreamSessionName} from './session-titles.mjs';
 import {networkMode,networkEnvironment} from './network-policy.mjs';
-import {officialEnvironment,checkOfficialStartup,cleanProviderEnvironment} from './official-account.mjs';
+import {officialEnvironment,checkOfficialStartup,cleanProviderEnvironment,loadModelProvider,providerEnvironment,packyModels} from './official-account.mjs';
 import {assertActiveAccount,claudeConfigDir,hostQueryOptions,HOST_MODES,MAX_ACCOUNTS,watchProviderSession} from './host-execution.mjs';
 import {createUsageService,fetchOfficialUsage} from './subscription-usage.mjs';
 import { createRequire } from "node:module";
@@ -55,6 +55,11 @@ const {createProviderRuntimeService} = await upstream('modules/providers/service
 const {query} = await import(pathToFileURL(require.resolve('@anthropic-ai/claude-agent-sdk')).href);
 // Never inherit API credentials from systemd or an old launcher.
 process.env=cleanProviderEnvironment(process.env);
+const modelProvider=await loadModelProvider();
+// The SDK also inherits process.env. Clear ambient proxy variables before any
+// Packy subprocess is created, not only the explicit per-query overrides.
+if(modelProvider.provider==='packy')process.env=networkEnvironment('packy-direct',process.env);
+const modelNetworkMode=()=>networkMode(modelProvider.provider);
 const runtime = createProviderRuntimeService({resolveProvider: name => {
   const provider = providerRegistry.resolveProvider(name);
   return {...provider, runtime:{...provider.runtime, run:async(command,options,writer,context)=>{
@@ -63,8 +68,8 @@ const runtime = createProviderRuntimeService({resolveProvider: name => {
     const row=tenants.session(options.ccUserId,options.sessionId);
     const account=requireHostOwner(options.ccUserId),configDir=claudeConfigDir(account);
     await fs.mkdir(configDir,{recursive:true,mode:0o700});
-    const mode=await networkMode();
-    const credential=await officialEnvironment();
+    const mode=await modelNetworkMode();
+    const credential=await providerEnvironment(modelProvider);
     const original=writer.options.onProviderSessionId;
     writer.options.onProviderSessionId=(native)=>{
       original?.(native);
@@ -146,14 +151,15 @@ installGeneratedRoutes(app,{auth,tenants,uid,wrap});
 const getSession=(userId,id)=>tenants.session(userId,id);
 // Tool-less helper runs (model list, titles) use the shared official account outside any project.
 const officialQueryBase=async mode=>({pathToClaudeCodeExecutable:'/home/appuser/.local/claude-code/node_modules/@anthropic-ai/claude-code/bin/claude.exe',
-  cwd:'/home/appuser/cloudcli-runtime/data/official-account',
-  env:networkEnvironment(mode,{PATH:'/usr/local/bin:/usr/bin:/bin',HOME:'/home/appuser',CLAUDE_CONFIG_DIR:'/home/appuser/cloudcli-runtime/data/official-account',...await officialEnvironment()})});
+  cwd:modelProvider.provider==='packy'?'/home/appuser/cloudcli-runtime/data/packy-account':'/home/appuser/cloudcli-runtime/data/official-account',
+  env:networkEnvironment(mode,{PATH:'/usr/local/bin:/usr/bin:/bin',HOME:'/home/appuser',CLAUDE_CONFIG_DIR:modelProvider.provider==='packy'?'/home/appuser/cloudcli-runtime/data/packy-account':'/home/appuser/cloudcli-runtime/data/official-account',...await providerEnvironment(modelProvider)})});
 let modelCache={at:0,ids:[],details:[]},modelLoading;
 async function models(){
-  const mode=await networkMode();
+  const mode=await modelNetworkMode();
   if(Date.now()-modelCache.at<(modelCache.complete?300000:30000))return modelCache.ids;
   if(modelLoading)return modelLoading;
   const read=async()=>{
+    if(modelProvider.provider==='packy')return packyModels(modelProvider);
     let release;
     // An empty streaming input permits native initialization/control requests
     // without submitting a user prompt or spending inference tokens.
@@ -172,7 +178,7 @@ async function models(){
   modelLoading=(async()=>{
     let valid=await read();
     if(!complete(valid)){await new Promise(r=>setTimeout(r,3000));valid=await read();}
-    if(!valid.length)throw fail('官方账号未返回可用模型',503);
+    if(!valid.length)throw fail('当前通道未返回可用模型',503);
     if(!complete(valid)&&modelCache.complete){modelCache={...modelCache,at:Date.now()-270000};return modelCache.ids;}
     const ids=valid.map(x=>x.value);
     modelCache={at:Date.now(),ids,details:valid,complete:complete(valid)};return ids;
@@ -185,15 +191,16 @@ const subscriptionUsage=createUsageService({read:async()=>{
 }});
 app.get('/api/core/usage',wrap(async(req,res)=>{
   requireHostOwner(uid(req));
+  if(modelProvider.provider==='packy')return res.json({state:'unavailable',windows:[],fetchedAt:null,nextRefreshAt:null,message:'当前使用 Packy Code API，费用和余额请在 Packy 控制台查看。'});
   res.json(await subscriptionUsage.get({refresh:req.query.refresh==='1'}));
 }));
-app.get('/api/core/me',wrap(async(req,res)=>res.json({...db.userDb.getUserById(uid(req)),admin:tenants.isAdmin(uid(req)),execution:'host',maxAccounts:MAX_ACCOUNTS})));
+app.get('/api/core/me',wrap(async(req,res)=>res.json({...db.userDb.getUserById(uid(req)),admin:tenants.isAdmin(uid(req)),execution:'host',maxAccounts:MAX_ACCOUNTS,modelProvider:modelProvider.provider})));
 app.get('/api/core/models',wrap(async(_req,res)=>{
   const ids=await models();
   const named=id=>modelCache.details.find(x=>x.value!=='default'&&x.resolvedModel===id)?.displayName;
   res.json({models:ids,labels:Object.fromEntries(modelCache.details.map(x=>[x.value,x.value==='default'?`账号默认${modelCache.complete&&named(x.resolvedModel)?`（${named(x.resolvedModel)}）`:'（推荐）'}`:x.displayName||x.value])),
     efforts:Object.fromEntries(modelCache.details.map(x=>[x.value,{levels:x.supportedEffortLevels||effortCapabilities(x.value).levels,default:null}])),
-    default:ids.includes('default')?'default':ids[0],provider:'claude.ai',proxy:'required'});
+    default:ids.includes('default')?'default':ids[0],provider:modelProvider.provider==='packy'?'packy':'claude.ai',proxy:modelProvider.provider==='packy'?'direct':'required'});
 }));
 app.get('/api/core/accounts',wrap(async(req,res)=>{
   if(!tenants.isAdmin(uid(req)))throw fail('仅主账号可以管理登录账号',403);
@@ -455,7 +462,7 @@ app.post('/api/core/sessions/:id/title',wrap(async(req,res)=>{
   titling.add(row.session_id);
   try{
     const ids=await models();
-    const title=await generateTitle({query,exchange,options:{...await officialQueryBase(await networkMode()),model:ids.includes('haiku')?'haiku':ids[0]}});
+    const title=await generateTitle({query,exchange,options:{...await officialQueryBase(await modelNetworkMode()),model:ids.includes('haiku')?'haiku':ids[0]}});
     if(!title)throw fail('没有生成可用的标题，请稍后再试',502);
     if(force)return res.json({id:row.session_id,title,suggested:true});
     if(!unrenamed(current()))return res.json({id:row.session_id,title:current(),skipped:true});
@@ -628,7 +635,7 @@ wss.on("connection", (ws, req) => {
                   if(row.project.archived)throw fail('请先恢复项目');
                   const model=frame.model || row.model || 'default';
                   const requestedEffort=frame.effort ?? 'auto';
-                  if(!(await models()).includes(model))throw fail('该历史模型已停用，请保留记录并新建官方账号对话');
+                  if(!(await models()).includes(model))throw fail('当前通道不支持该历史模型，请在对话设置中选择可用模型；原记录保持不变');
                   const detail=modelCache.details.find(x=>x.value===model);
                   const effortConfig={levels:detail.supportedEffortLevels||effortCapabilities(model).levels,default:null};
                   resolveEffort(model,requestedEffort,effortConfig);
@@ -680,7 +687,7 @@ wss.on("connection", (ws, req) => {
 // Once per backend process, not per browser login, message or SDK subprocess.
 // Keep history available if the proxy is down; inference still has no direct
 // route, and credential refresh has its own mandatory network preflight.
-await checkOfficialStartup().then(()=>console.log('CC proxy startup probe passed')).catch(error=>console.warn(error.message));
+if(modelProvider.provider==='official')await checkOfficialStartup().then(()=>console.log('CC proxy startup probe passed')).catch(error=>console.warn(error.message));
 server.listen(Number(process.env.CCWEB_PORT||3107), "127.0.0.1", () =>
   console.log("Claude project center ready on loopback:3107"),
 );

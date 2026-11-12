@@ -16,3 +16,25 @@ test('model discovery rejects unsupported transport and malformed proxy policy b
   assert.throws(()=>providerJSON('http://provider.invalid',{mode:'on'}));
   assert.throws(()=>providerJSON('https://provider.invalid',{mode:'unknown'}));
 });
+
+import {validateModelProvider,providerEnvironment,packyModelDetails,cleanProviderEnvironment} from '../../integrations/cloudcli/official-account.mjs';
+import {networkMode} from '../../integrations/cloudcli/network-policy.mjs';
+test('Packy direct transport cannot carry OAuth or inherited proxies',async()=>{
+  const config=validateModelProvider({provider:'packy',baseUrl:'https://cf.api.fan',apiKey:'synthetic-fixture-key'});
+  assert.equal(await networkMode('packy'),'packy-direct');
+  const ambient=cleanProviderEnvironment({CLAUDE_CODE_OAUTH_TOKEN:'synthetic-oauth',ANTHROPIC_API_KEY:'stale-key',HTTPS_PROXY:'http://invalid',all_proxy:'http://invalid',PATH:'test'});
+  const env=networkEnvironment('packy-direct',{...ambient,...await providerEnvironment(config)});
+  assert.equal(env.ANTHROPIC_AUTH_TOKEN,'synthetic-fixture-key');
+  assert.equal(env.CLAUDE_CODE_OAUTH_TOKEN,undefined);assert.equal(env.ANTHROPIC_API_KEY,undefined);
+  assert(!Object.keys(env).some(k=>/proxy/i.test(k)));assert.equal(env.PATH,'test');
+  assert.throws(()=>validateModelProvider({...config,baseUrl:'https://unrelated.example'}));
+  assert.throws(()=>validateModelProvider({...config,apiKey:''}));
+  assert.throws(()=>validateModelProvider({provider:'unknown'}));
+  assert.throws(()=>providerJSON('https://api.anthropic.com/v1/models',{mode:'packy-direct'}));
+});
+test('Packy catalog retains exact historical model IDs and advertises only available aliases',()=>{
+  const details=packyModelDetails({data:[{id:'claude-opus-5-5'},{id:'claude-opus-5-5'},{id:'claude-haiku-5-5'},{id:'unrelated'},{id:'bad/id'}]});
+  assert.deepEqual(details.map(x=>x.value),['claude-opus-5-5','claude-haiku-5-5','default','opus','haiku']);
+  assert.equal(details.find(x=>x.value==='opus').resolvedModel,'claude-opus-5-5');
+  assert.deepEqual(packyModelDetails({}),[]);
+});
